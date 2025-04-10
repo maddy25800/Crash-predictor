@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crash Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #111; color: #fff; }
+    input, button { padding: 10px; margin: 10px 0; width: 100%; }
+    #result { font-size: 1.5em; margin-top: 20px; color: #0f0; }
+  </style>
+</head>
+<body>
+  <h2>Crash Predictor (Stake Style)</h2>
+  <input type="text" id="seed" placeholder="Enter Server Seed">
+  <button onclick="predictCrash()">Predict Crash</button>
+  <div id="result"></div>
+
+  <script>
+    function predictCrash() {
+      const seed = document.getElementById('seed').value.trim();
+      if (!seed) return alert("Please enter a seed");
+
+      const hash = CryptoJS.HmacSHA256("", seed).toString();
+      if (BigInt('0x' + hash) % 33n === 0n) {
+        document.getElementById('result').innerText = "Crash Point: 1.00x (Instant Crash)";
+        return;
+      }
+
+      const h = BigInt('0x' + hash.slice(0, 13));
+      const e = BigInt(2) ** 52n;
+      const crash = Number((100n * e - h) * 100n / ((e - h))) / 100;
+      document.getElementById('result').innerText = `Crash Point: ${crash.toFixed(2)}x`;
+    }
+  </script>
+
+  <!-- CryptoJS for HMAC-SHA256 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
